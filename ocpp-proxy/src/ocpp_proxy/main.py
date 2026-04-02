@@ -195,8 +195,11 @@ async def init_app() -> web.Application:
     # Set app reference for backend manager
     app["backend_manager"].set_app_reference(app)
 
-    # Start OCPP service connections
-    await ocpp_service_manager.start_services()
+    async def on_startup(_app: web.Application) -> None:
+        await ocpp_service_manager.start_services()
+
+    app.on_startup.append(on_startup)
+    app.on_cleanup.append(cleanup_app)
 
     app.add_routes(
         [
@@ -221,10 +224,7 @@ async def cleanup_app(app: web.Application) -> None:
 def main() -> None:
     """Entrypoint for the proxy server."""
     logging.basicConfig(level=logging.INFO)
-    app = asyncio.run(init_app())
-    # Add cleanup handler
-    app.on_cleanup.append(cleanup_app)
-    web.run_app(app, port=int(os.getenv("PORT", 9000)))
+    web.run_app(init_app(), port=int(os.getenv("PORT", 9000)))
 
 
 if __name__ == "__main__":
