@@ -31,9 +31,9 @@ RUN \
         "PyYAML>=6.0.0" \
     && apk del .build-dependencies
 
-# Copy and setup run script
-COPY run.sh /
-RUN chmod a+x /run.sh
+# Install as s6-overlay supervised service
+COPY run.sh /etc/services.d/ocpp-proxy/run
+RUN chmod a+x /etc/services.d/ocpp-proxy/run
 
 # Expose WebSocket port
 EXPOSE 9000
@@ -58,4 +58,4 @@ LABEL \
     org.opencontainers.image.revision="${BUILD_REF}" \
     org.opencontainers.image.version="${BUILD_VERSION}"
 
-CMD [ "/run.sh" ]
+# s6-overlay starts the service from /etc/services.d/ocpp-proxy/run

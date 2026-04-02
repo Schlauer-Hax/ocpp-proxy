@@ -196,7 +196,7 @@ async def init_app() -> web.Application:
     app["backend_manager"].set_app_reference(app)
 
     async def on_startup(_app: web.Application) -> None:
-        await ocpp_service_manager.start_services()
+        asyncio.create_task(ocpp_service_manager.start_services())
 
     app.on_startup.append(on_startup)
     app.on_cleanup.append(cleanup_app)
