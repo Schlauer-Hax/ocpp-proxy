@@ -73,12 +73,15 @@ class OCPPServiceManager:
                 subprotocols = [cast("Subprotocol", "ocpp2.0.1")]
 
             # Create WebSocket connection
-            connection = await websockets.connect(
-                url,
-                extra_headers=auth_headers,
-                subprotocols=subprotocols,
-                ping_interval=30,
-                ping_timeout=10,
+            connection = await asyncio.wait_for(
+                websockets.connect(
+                    url,
+                    extra_headers=auth_headers,
+                    subprotocols=subprotocols,
+                    ping_interval=30,
+                    ping_timeout=10,
+                ),
+                timeout=10,
             )
 
             # Create OCPP client using factory
