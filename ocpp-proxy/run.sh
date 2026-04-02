@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 echo "[$(date '+%H:%M:%S')] INFO: Starting OCPP Proxy..."
 

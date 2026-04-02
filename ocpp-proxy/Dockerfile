@@ -1,39 +1,27 @@
 # Home Assistant add-on Dockerfile
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest
-FROM ${BUILD_FROM}
+FROM python:3.12-alpine
 
-# Set shell for add-on compatibility
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Install system dependencies and Python packages
-RUN \
-    apk add --no-cache \
-        python3 \
-        py3-pip \
-        py3-setuptools \
-        py3-wheel \
-    && apk add --no-cache --virtual .build-dependencies \
+# Install system dependencies
+RUN apk add --no-cache \
         gcc \
-        musl-dev \
-        python3-dev
+        musl-dev
 
 # Copy application source to /app
 WORKDIR /app
 COPY src/ ./src/
 COPY pyproject.toml poetry.lock* ./
 
-# Install Python dependencies with break-system-packages flag
-RUN \
-    pip3 install --break-system-packages \
+# Install Python dependencies
+RUN pip install --no-cache-dir \
         "ocpp>=2.0.0" \
         "aiohttp>=3.9.0" \
         "websockets>=12.0" \
         "PyYAML>=6.0.0" \
-    && apk del .build-dependencies
+    && apk del gcc musl-dev
 
-# Install as s6-overlay supervised service
-COPY run.sh /etc/services.d/ocpp-proxy/run
-RUN chmod a+x /etc/services.d/ocpp-proxy/run
+# Copy run script
+COPY run.sh /run.sh
+RUN chmod a+x /run.sh
 
 # Expose WebSocket port
 EXPOSE 9000
@@ -58,4 +46,4 @@ LABEL \
     org.opencontainers.image.revision="${BUILD_REF}" \
     org.opencontainers.image.version="${BUILD_VERSION}"
 
-# s6-overlay starts the service from /etc/services.d/ocpp-proxy/run
+CMD [ "/run.sh" ]

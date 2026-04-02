@@ -3,6 +3,7 @@ version: '0.1.12'
 slug: ocpp-proxy
 description: 'OCPP 1.6 JSON WebSocket proxy for EV charger sharing'
 homeassistant_api: true
+init: false
 arch:
   - amd64
   - armv7
