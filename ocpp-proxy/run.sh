@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bashio
+#!/command/with-contenv bashio
 
 bashio::log.info "Starting OCPP Proxy..."
 
@@ -6,5 +6,5 @@ bashio::log.info "Starting OCPP Proxy..."
 cd /app
 export PYTHONPATH=/app/src
 
-# Start the OCCP Proxy
+# Start the OCPP Proxy
 exec python3 -m ocpp_proxy.main
