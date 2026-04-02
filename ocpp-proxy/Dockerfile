@@ -31,9 +31,13 @@ RUN \
         "PyYAML>=6.0.0" \
     && apk del .build-dependencies
 
-# Copy run script as an s6-overlay service
-COPY run.sh /etc/services.d/ocpp-proxy/run
-RUN chmod a+x /etc/services.d/ocpp-proxy/run
+# Set up s6-overlay v3 service for the OCPP Proxy
+RUN mkdir -p /etc/s6-overlay/s6-rc.d/ocpp-proxy \
+    && echo "longrun" > /etc/s6-overlay/s6-rc.d/ocpp-proxy/type \
+    && mkdir -p /etc/s6-overlay/s6-rc.d/user/contents.d \
+    && touch /etc/s6-overlay/s6-rc.d/user/contents.d/ocpp-proxy
+COPY run.sh /etc/s6-overlay/s6-rc.d/ocpp-proxy/run
+RUN chmod a+x /etc/s6-overlay/s6-rc.d/ocpp-proxy/run
 
 # Expose WebSocket port
 EXPOSE 9000
@@ -58,4 +62,4 @@ LABEL \
     org.opencontainers.image.revision="${BUILD_REF}" \
     org.opencontainers.image.version="${BUILD_VERSION}"
 
-# s6-overlay handles service startup via /etc/services.d/ocpp-proxy/run
+# s6-overlay v3 handles service startup via s6-rc
